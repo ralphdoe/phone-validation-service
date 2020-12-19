@@ -8,6 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PhoneNumberResponse {
+
   private String number;
   private String country;
   private Boolean isValid;
