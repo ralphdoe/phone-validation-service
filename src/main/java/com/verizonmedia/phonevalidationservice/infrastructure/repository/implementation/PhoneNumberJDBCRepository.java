@@ -1,13 +1,15 @@
-package com.verizonmedia.phonevalidationservice.infrastructure.repository;
+package com.verizonmedia.phonevalidationservice.infrastructure.repository.implementation;
 
 import com.verizonmedia.phonevalidationservice.domain.models.PhoneNumber;
+import com.verizonmedia.phonevalidationservice.infrastructure.repository.PhoneNumberRepository;
+import com.verizonmedia.phonevalidationservice.infrastructure.repository.implementation.PhoneNumberRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class PhoneNumberJDBCRepository {
+public class PhoneNumberJDBCRepository implements PhoneNumberRepository {
 
   private static final String PHONE_NUMBER_SELECT_QUERY =
       "SELECT * FROM phone_numbers WHERE phone_number = ?;";
@@ -28,8 +30,8 @@ public class PhoneNumberJDBCRepository {
     }
   }
 
-  public int createPhoneNumber(PhoneNumber phoneNumber) {
-    return jdbcTemplate
+  public void createPhoneNumber(PhoneNumber phoneNumber) {
+    jdbcTemplate
         .update(PHONE_NUMBER_INSERT_QUERY,
             phoneNumber.getNumber(), phoneNumber.getIsValid(),
             phoneNumber.getLocalFormat(), phoneNumber.getInternationalFormat(),

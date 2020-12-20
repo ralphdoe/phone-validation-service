@@ -1,4 +1,4 @@
-package com.verizonmedia.phonevalidationservice.infrastructure.repository;
+package com.verizonmedia.phonevalidationservice.infrastructure.repository.implementation;
 
 import com.verizonmedia.phonevalidationservice.domain.models.PhoneNumber;
 import java.sql.ResultSet;
