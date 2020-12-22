@@ -1,9 +1,10 @@
 package com.verizonmedia.phonevalidationservice.application;
 
 import com.verizonmedia.phonevalidationservice.domain.responses.PhoneNumberResponse;
+import java.util.Optional;
 
 public interface PhoneNumberValidationService {
 
-  PhoneNumberResponse validatePhoneNumber(String number);
+  Optional<PhoneNumberResponse> validatePhoneNumber(String number);
 
 }

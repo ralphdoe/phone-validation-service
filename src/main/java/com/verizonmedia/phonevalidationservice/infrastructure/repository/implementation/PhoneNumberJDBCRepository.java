@@ -2,7 +2,7 @@ package com.verizonmedia.phonevalidationservice.infrastructure.repository.implem
 
 import com.verizonmedia.phonevalidationservice.domain.models.PhoneNumber;
 import com.verizonmedia.phonevalidationservice.infrastructure.repository.PhoneNumberRepository;
-import com.verizonmedia.phonevalidationservice.infrastructure.repository.implementation.PhoneNumberRowMapper;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -21,12 +21,13 @@ public class PhoneNumberJDBCRepository implements PhoneNumberRepository {
   @Autowired
   JdbcTemplate jdbcTemplate;
 
-  public PhoneNumber findByNumber(String number) {
+  public Optional<PhoneNumber> findByNumber(String number) {
     try {
-      return jdbcTemplate
+      PhoneNumber phoneNumber = jdbcTemplate
           .queryForObject(PHONE_NUMBER_SELECT_QUERY, new PhoneNumberRowMapper(), number);
+      return Optional.ofNullable(phoneNumber);
     } catch (EmptyResultDataAccessException ex) {
-      return null;
+      return Optional.empty();
     }
   }
 

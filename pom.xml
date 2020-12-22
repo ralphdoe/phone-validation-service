@@ -18,6 +18,8 @@
   <properties>
     <java.version>11</java.version>
     <spring-cloud.version>Hoxton.SR4</spring-cloud.version>
+    <jmapper-core.version>1.6.1.CR2</jmapper-core.version>
+    <spring.fox.version>3.0.0</spring.fox.version>
   </properties>
 
   <dependencies>
@@ -50,6 +52,11 @@
       <optional>true</optional>
     </dependency>
     <dependency>
+      <groupId>com.googlecode.jmapper-framework</groupId>
+      <artifactId>jmapper-core</artifactId>
+      <version>${jmapper-core.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
@@ -59,6 +66,16 @@
           <artifactId>junit-vintage-engine</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-boot-starter</artifactId>
+      <version>${spring.fox.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger-ui</artifactId>
+      <version>${spring.fox.version}</version>
     </dependency>
   </dependencies>
 

@@ -3,41 +3,45 @@ package com.verizonmedia.phonevalidationservice.application.implementation;
 import com.verizonmedia.phonevalidationservice.application.PhoneNumberValidationService;
 import com.verizonmedia.phonevalidationservice.domain.models.PhoneNumber;
 import com.verizonmedia.phonevalidationservice.domain.responses.PhoneNumberResponse;
-import com.verizonmedia.phonevalidationservice.infrastructure.consumers.implementation.PhoneNumberNumVerifyWebClient;
+import com.verizonmedia.phonevalidationservice.infrastructure.consumers.PhoneNumberClient;
 import com.verizonmedia.phonevalidationservice.infrastructure.repository.PhoneNumberRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+@RequiredArgsConstructor
 @Service
 public class DefaultPhoneNumberValidationService implements PhoneNumberValidationService {
 
-  @Value("${numverify.access.token}")
-  private String token;
-
-  @Autowired
-  private PhoneNumberRepository phoneNumberJDBCRepository;
-
-  @Autowired
-  private PhoneNumberNumVerifyWebClient phoneNumberWebClient;
+  private final PhoneNumberRepository phoneNumberJDBCRepository;
+  private final PhoneNumberClient phoneNumberClient;
 
   @Override
-  public PhoneNumberResponse validatePhoneNumber(String number) {
-    PhoneNumber phoneNumber = phoneNumberJDBCRepository.findByNumber(number);
-    if (phoneNumber == null) {
-      phoneNumber = phoneNumberWebClient
-          .getPhoneNumber(token, number);
-
-      if (!StringUtils.isEmpty(phoneNumber.getNumber())) {
-        phoneNumberJDBCRepository.createPhoneNumber(phoneNumber);
+  public Optional<PhoneNumberResponse> validatePhoneNumber(String number) {
+    Optional<PhoneNumber> phoneNumber = phoneNumberJDBCRepository.findByNumber(number);
+    if (phoneNumber.isEmpty()) {
+      phoneNumber = phoneNumberClient.getPhoneNumber(number);
+      if (phoneNumber.isPresent()) {
+        PhoneNumber phoneNumberObject = phoneNumber.get();
+        if (!StringUtils.isEmpty(phoneNumberObject.getNumber())) {
+          phoneNumberJDBCRepository.createPhoneNumber(phoneNumberObject);
+          return Optional.of(getPhoneNumberResponseFromPhoneNumber(
+              phoneNumberObject));
+        }
       }
-    }
-    PhoneNumberResponse phoneNumberResponse = new PhoneNumberResponse();
-    phoneNumberResponse.setIsValid(phoneNumber.getIsValid());
-    phoneNumberResponse.setCountry(phoneNumber.getCountryName());
-    phoneNumberResponse.setNumber(phoneNumber.getNumber());
+    } else {
+      return Optional.of(getPhoneNumberResponseFromPhoneNumber(phoneNumber.get()));
 
+    }
+    return Optional.empty();
+  }
+
+  private PhoneNumberResponse getPhoneNumberResponseFromPhoneNumber(PhoneNumber phoneNumberObject) {
+    PhoneNumberResponse phoneNumberResponse = new PhoneNumberResponse();
+    phoneNumberResponse.setIsValid(phoneNumberObject.getIsValid());
+    phoneNumberResponse.setCountry(phoneNumberObject.getCountryName());
+    phoneNumberResponse.setNumber(phoneNumberObject.getNumber());
     return phoneNumberResponse;
   }
 }

@@ -3,28 +3,25 @@ package com.verizonmedia.phonevalidationservice.infrastructure.controllers.imple
 import com.verizonmedia.phonevalidationservice.application.PhoneNumberValidationService;
 import com.verizonmedia.phonevalidationservice.domain.responses.PhoneNumberResponse;
 import com.verizonmedia.phonevalidationservice.infrastructure.controllers.PhoneNumberController;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+@RequiredArgsConstructor
 @RestController
 public class PhoneNumberRestController implements PhoneNumberController {
 
-  @Autowired
-  private PhoneNumberValidationService phoneNumberValidationService;
+  private final PhoneNumberValidationService phoneNumberValidationService;
 
   @GetMapping("/validate/{number}")
   public ResponseEntity<PhoneNumberResponse> validatePhoneNumber(
       @PathVariable("number") String number) {
-    PhoneNumberResponse phoneNumberResponse = phoneNumberValidationService
+    Optional<PhoneNumberResponse> phoneNumberResponse = phoneNumberValidationService
         .validatePhoneNumber(number);
-    if (StringUtils.isEmpty(phoneNumberResponse.getNumber())) {
-      return ResponseEntity.notFound().build();
-    } else {
-      return ResponseEntity.ok(phoneNumberResponse);
-    }
+    return phoneNumberResponse.map(ResponseEntity::ok)
+        .orElseGet(() -> ResponseEntity.notFound().build());
   }
 }
