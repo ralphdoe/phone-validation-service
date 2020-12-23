@@ -1,6 +1,7 @@
 package com.verizonmedia.phonevalidationservice.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.googlecode.jmapper.annotations.JMap;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
