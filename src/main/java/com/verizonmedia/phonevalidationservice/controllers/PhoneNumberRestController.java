@@ -1,8 +1,7 @@
-package com.verizonmedia.phonevalidationservice.infrastructure.controllers.implementation;
+package com.verizonmedia.phonevalidationservice.controllers;
 
-import com.verizonmedia.phonevalidationservice.application.PhoneNumberValidationService;
-import com.verizonmedia.phonevalidationservice.domain.responses.PhoneNumberResponse;
-import com.verizonmedia.phonevalidationservice.infrastructure.controllers.PhoneNumberController;
+import com.verizonmedia.phonevalidationservice.models.PhoneNumberResponse;
+import com.verizonmedia.phonevalidationservice.services.PhoneNumberValidationService;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

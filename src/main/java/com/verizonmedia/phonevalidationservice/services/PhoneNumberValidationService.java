@@ -1,10 +1,9 @@
-package com.verizonmedia.phonevalidationservice.application.implementation;
+package com.verizonmedia.phonevalidationservice.services;
 
-import com.verizonmedia.phonevalidationservice.application.PhoneNumberValidationService;
-import com.verizonmedia.phonevalidationservice.domain.models.PhoneNumber;
-import com.verizonmedia.phonevalidationservice.domain.responses.PhoneNumberResponse;
-import com.verizonmedia.phonevalidationservice.infrastructure.consumers.PhoneNumberClient;
-import com.verizonmedia.phonevalidationservice.infrastructure.repository.PhoneNumberRepository;
+import com.verizonmedia.phonevalidationservice.consumers.PhoneNumberClient;
+import com.verizonmedia.phonevalidationservice.repository.PhoneNumberRepository;
+import com.verizonmedia.phonevalidationservice.models.PhoneNumber;
+import com.verizonmedia.phonevalidationservice.models.PhoneNumberResponse;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,12 +11,11 @@ import org.springframework.util.StringUtils;
 
 @RequiredArgsConstructor
 @Service
-public class DefaultPhoneNumberValidationService implements PhoneNumberValidationService {
+public class PhoneNumberValidationService {
 
   private final PhoneNumberRepository phoneNumberJDBCRepository;
   private final PhoneNumberClient phoneNumberClient;
 
-  @Override
   public Optional<PhoneNumberResponse> validatePhoneNumber(String number) {
     Optional<PhoneNumber> phoneNumber = phoneNumberJDBCRepository.findByNumber(number);
     if (phoneNumber.isEmpty()) {

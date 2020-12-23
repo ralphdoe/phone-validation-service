@@ -1,6 +1,6 @@
-package com.verizonmedia.phonevalidationservice.infrastructure.controllers;
+package com.verizonmedia.phonevalidationservice.controllers;
 
-import com.verizonmedia.phonevalidationservice.domain.responses.PhoneNumberResponse;
+import com.verizonmedia.phonevalidationservice.models.PhoneNumberResponse;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.info.Info;

@@ -1,4 +1,4 @@
-package com.verizonmedia.phonevalidationservice.domain.models;
+package com.verizonmedia.phonevalidationservice.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

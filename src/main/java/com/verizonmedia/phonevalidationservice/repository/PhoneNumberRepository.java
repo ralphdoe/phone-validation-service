@@ -1,6 +1,6 @@
-package com.verizonmedia.phonevalidationservice.infrastructure.repository;
+package com.verizonmedia.phonevalidationservice.repository;
 
-import com.verizonmedia.phonevalidationservice.domain.models.PhoneNumber;
+import com.verizonmedia.phonevalidationservice.models.PhoneNumber;
 import java.util.Optional;
 
 public interface PhoneNumberRepository {

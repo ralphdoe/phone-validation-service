@@ -1,4 +1,4 @@
-package com.verizonmedia.phonevalidationservice.domain.responses;
+package com.verizonmedia.phonevalidationservice.models;
 
 import lombok.Data;
 import lombok.Getter;

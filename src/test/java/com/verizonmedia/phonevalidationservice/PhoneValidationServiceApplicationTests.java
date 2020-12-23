@@ -2,7 +2,7 @@ package com.verizonmedia.phonevalidationservice;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.verizonmedia.phonevalidationservice.infrastructure.controllers.implementation.PhoneNumberRestController;
+import com.verizonmedia.phonevalidationservice.controllers.PhoneNumberRestController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

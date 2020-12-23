@@ -1,7 +1,6 @@
-package com.verizonmedia.phonevalidationservice.infrastructure.consumers.implementation;
+package com.verizonmedia.phonevalidationservice.consumers;
 
-import com.verizonmedia.phonevalidationservice.domain.models.PhoneNumber;
-import com.verizonmedia.phonevalidationservice.infrastructure.consumers.PhoneNumberClient;
+import com.verizonmedia.phonevalidationservice.models.PhoneNumber;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -13,7 +12,7 @@ public class PhoneNumberNumVerifyWebClient implements PhoneNumberClient {
   @Value("${numverify.access.token}")
   private String token;
 
-  private static final String URL = "http://apilayernet";
+  private static final String URL = "http://apilayer.net";
   private static final String ENDPOINT = "/api/validate";
   private static final String ACCESS_KEY_NAME = "access_key";
   private static final String NUMBER_NAME = "number";
