@@ -2,6 +2,7 @@ package com.verizonmedia.phonevalidationservice.phone;
 
 import com.googlecode.jmapper.JMapper;
 import com.verizonmedia.phonevalidationservice.phone.webclient.PhoneNumberClient;
+import com.verizonmedia.phonevalidationservice.phone.webclient.WebClientException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +18,6 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 @Service
 public class PhoneNumberValidationService {
-
 
   private final PhoneNumberJDBCRepository phoneNumberJDBCRepository;
   private final PhoneNumberClient phoneNumberClient;
@@ -42,7 +42,12 @@ public class PhoneNumberValidationService {
     }
 
     // If the Phone Number is not in the Database it goes to a third party service to obtain data.
-    phoneNumber = phoneNumberClient.getPhoneNumber(number);
+    try {
+      phoneNumber = phoneNumberClient.getPhoneNumber(number);
+    } catch (WebClientException e) {
+      log.error(e.getMessage());
+      return Optional.empty();
+    }
     if (phoneNumber.isPresent()) {
       PhoneNumber phoneNumberObject = phoneNumber.get();
       if (!StringUtils.isEmpty(phoneNumberObject.getNumber())) {
@@ -65,7 +70,11 @@ public class PhoneNumberValidationService {
     List<PhoneNumber> phoneNumberBatch = new ArrayList<>();
     for (String number : numbers) {
       if (phoneNumberList.stream().map(PhoneNumber::getNumber).noneMatch(number::equals)) {
-        phoneNumberClient.getPhoneNumber(number).map(phoneNumberBatch::add);
+        try {
+          phoneNumberClient.getPhoneNumber(number).map(phoneNumberBatch::add);
+        } catch (WebClientException e) {
+          log.error(e.getMessage());
+        }
       }
     }
     if (phoneNumberBatch.size() > 0) {

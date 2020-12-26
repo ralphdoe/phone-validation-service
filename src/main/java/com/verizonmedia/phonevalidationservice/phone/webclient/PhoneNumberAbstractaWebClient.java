@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Slf4j
-@Service
-public class PhoneNumberAbstractaWebClient implements PhoneNumberClient {
+//@Service
+public class PhoneNumberAbstractaWebClient {
 
   public static final int SECONDS = 10;
   private static final String URL = "https://phonevalidation.abstractapi.com";
@@ -27,7 +27,7 @@ public class PhoneNumberAbstractaWebClient implements PhoneNumberClient {
         .uri(uriBuilder -> uriBuilder
             .path(ENDPOINT)
             .queryParam(ACCESS_KEY_NAME, token)
-            .queryParam(NUMBER_NAME, number)
+            //.queryParam(NUMBER_NAME, number)
             .build())
         .retrieve().bodyToFlux(PhoneNumber.class).timeout(Duration.ofSeconds(SECONDS))
         .blockFirst());

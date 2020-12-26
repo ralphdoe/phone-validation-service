@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import com.verizonmedia.phonevalidationservice.phone.webclient.PhoneNumberClient;
-import java.sql.SQLException;
+import com.verizonmedia.phonevalidationservice.phone.webclient.WebClientException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -48,7 +48,8 @@ class PhoneNumberValidationServiceTest {
   }
 
   @Test
-  public void obtainResponseWhenInfoIsNotInDatabase() throws EmptyResultDataAccessException {
+  public void obtainResponseWhenInfoIsNotInDatabase()
+      throws EmptyResultDataAccessException, WebClientException {
     PhoneNumber phoneNumber = new PhoneNumber();
     phoneNumber.setNumber("14154582468");
     phoneNumber.setCountryName("United States");
@@ -64,7 +65,8 @@ class PhoneNumberValidationServiceTest {
   }
 
   @Test
-  public void obtainEmptyResponseWhenInfoIsNotInDatabaseNeitherExternalAPI() throws EmptyResultDataAccessException {
+  public void obtainEmptyResponseWhenInfoIsNotInDatabaseNeitherExternalAPI()
+      throws EmptyResultDataAccessException, WebClientException {
     PhoneNumber phoneNumber = new PhoneNumber();
     phoneNumber.setNumber("14154582468");
     phoneNumber.setCountryName("United States");

@@ -18,6 +18,6 @@ public interface PhoneNumberClient {
    * @param number the number we are goint to search in external service.
    * @return Optional PhoneNumber obtained from third party service.
    */
-  Optional<PhoneNumber> getPhoneNumber(String number);
+  Optional<PhoneNumber> getPhoneNumber(String number) throws WebClientException;
 
 }

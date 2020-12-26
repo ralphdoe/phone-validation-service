@@ -5,8 +5,10 @@ import java.time.Duration;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @Service
@@ -23,14 +25,18 @@ public class PhoneNumberNumVerifyWebClient implements PhoneNumberClient {
 
   private final WebClient webClient = WebClient.create(URL);
 
-  public Optional<PhoneNumber> getPhoneNumber(String number) {
-    return Optional.ofNullable(this.webClient.get()
+  public Optional<PhoneNumber> getPhoneNumber(String number) throws WebClientException{
+    return this.webClient.get()
         .uri(uriBuilder -> uriBuilder
             .path(ENDPOINT)
             .queryParam(ACCESS_KEY_NAME, token)
             .queryParam(NUMBER_NAME, number)
             .build())
-        .retrieve().bodyToFlux(PhoneNumber.class).timeout(Duration.ofSeconds(SECONDS))
-        .blockFirst());
+        .retrieve()
+        .onStatus(HttpStatus::is4xxClientError,
+            clientResponse -> Mono.error(new WebClientException("404", "Phone Number Not Found")))
+        .onStatus(HttpStatus::is1xxInformational,
+            clientResponse -> Mono.error(new WebClientException("104", "User Limit Reached")))
+        .bodyToMono(PhoneNumber.class).timeout(Duration.ofSeconds(SECONDS)).blockOptional();
   }
 }
