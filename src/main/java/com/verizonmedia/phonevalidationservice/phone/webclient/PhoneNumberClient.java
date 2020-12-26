@@ -1,13 +1,16 @@
-package com.verizonmedia.phonevalidationservice.consumers;
+package com.verizonmedia.phonevalidationservice.phone.webclient;
 
-import com.verizonmedia.phonevalidationservice.models.PhoneNumber;
+import com.verizonmedia.phonevalidationservice.phone.PhoneNumber;
 import java.util.Optional;
 
 /**
  * Class to communicate with Third Party Services to Obtain Phone Number Data.
+ *
  * @author Rafael López
  */
 public interface PhoneNumberClient {
+
+  String NUMBER_NAME = "number";
 
   /**
    * Obtain the PhoneNumber by the Number.

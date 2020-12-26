@@ -1,4 +1,4 @@
-package com.verizonmedia.phonevalidationservice.models;
+package com.verizonmedia.phonevalidationservice.phone;
 
 import com.googlecode.jmapper.annotations.JMap;
 import lombok.Data;

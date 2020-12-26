@@ -1,9 +1,8 @@
-package com.verizonmedia.phonevalidationservice.controllers;
+package com.verizonmedia.phonevalidationservice.phone;
 
-import com.verizonmedia.phonevalidationservice.models.PhoneNumberResponse;
-import com.verizonmedia.phonevalidationservice.services.PhoneNumberValidationService;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +27,7 @@ public class PhoneNumberRestController implements PhoneNumberController {
 
   @GetMapping("/validate")
   public ResponseEntity<List<PhoneNumberResponse>> validatePhoneNumbers(
-      @RequestParam List<String> numbers) {
+      @RequestParam Set<String> numbers) {
     List<PhoneNumberResponse> response = phoneNumberValidationService.validatePhoneNumbers(numbers);
     if (response.isEmpty()) {
       return ResponseEntity.notFound().build();

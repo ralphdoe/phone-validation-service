@@ -1,10 +1,10 @@
-package com.verizonmedia.phonevalidationservice.controllers;
+package com.verizonmedia.phonevalidationservice.phone;
 
-import com.verizonmedia.phonevalidationservice.models.PhoneNumberResponse;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.info.Info;
 import java.util.List;
+import java.util.Set;
 import org.springframework.http.ResponseEntity;
 
 @OpenAPIDefinition(
@@ -16,6 +16,6 @@ public interface PhoneNumberController {
   ResponseEntity<PhoneNumberResponse> validatePhoneNumber(String number);
 
   @Operation(summary = "You can validate a list of Phone Numbers.")
-  ResponseEntity<List<PhoneNumberResponse>> validatePhoneNumbers(List<String> number);
+  ResponseEntity<List<PhoneNumberResponse>> validatePhoneNumbers(Set<String> number);
 
 }

@@ -1,6 +1,5 @@
-package com.verizonmedia.phonevalidationservice.repository;
+package com.verizonmedia.phonevalidationservice.phone;
 
-import com.verizonmedia.phonevalidationservice.models.PhoneNumber;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.springframework.jdbc.core.RowMapper;

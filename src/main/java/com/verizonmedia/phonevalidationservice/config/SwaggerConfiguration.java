@@ -19,7 +19,7 @@ public class SwaggerConfiguration {
     return new Docket(DocumentationType.OAS_30)
         .select()
         .apis(RequestHandlerSelectors.basePackage(
-            "com.verizonmedia.phonevalidationservice.controllers"))
+            "com.verizonmedia.phonevalidationservice.phone"))
         .paths(PathSelectors.any())
         .build()
         .apiInfo(apiInfo());

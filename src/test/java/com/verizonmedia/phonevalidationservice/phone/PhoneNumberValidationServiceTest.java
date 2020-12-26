@@ -1,22 +1,22 @@
-package com.verizonmedia.phonevalidationservice.application.implementation;
+package com.verizonmedia.phonevalidationservice.phone;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-import com.verizonmedia.phonevalidationservice.consumers.PhoneNumberClient;
-import com.verizonmedia.phonevalidationservice.models.PhoneNumber;
-import com.verizonmedia.phonevalidationservice.models.PhoneNumberResponse;
-import com.verizonmedia.phonevalidationservice.repository.PhoneNumberRepository;
-import com.verizonmedia.phonevalidationservice.services.PhoneNumberValidationService;
+import com.verizonmedia.phonevalidationservice.phone.webclient.PhoneNumberClient;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 @ExtendWith(MockitoExtension.class)
 class PhoneNumberValidationServiceTest {
@@ -26,7 +26,7 @@ class PhoneNumberValidationServiceTest {
   public static final int ACTUAL = 2;
 
   @Mock
-  private PhoneNumberRepository phoneNumberJDBCRepository;
+  private PhoneNumberJDBCRepository phoneNumberJDBCRepository;
   @Mock
   private PhoneNumberClient phoneNumberClient;
 
@@ -34,13 +34,12 @@ class PhoneNumberValidationServiceTest {
   private PhoneNumberValidationService phoneNumberValidationService;
 
   @Test
-  public void obtainResponseWhenInfoComesFromDatabase() {
+  public void obtainResponseWhenInfoComesFromDatabase() throws EmptyResultDataAccessException {
     PhoneNumber phoneNumber = new PhoneNumber();
     phoneNumber.setNumber("14154582468");
     phoneNumber.setCountryName("United States");
     phoneNumber.setIsValid(Boolean.TRUE);
     when(phoneNumberJDBCRepository.findByNumber(NUMBER)).thenReturn(Optional.of(phoneNumber));
-
     Optional<PhoneNumberResponse> phoneNumberResponse = phoneNumberValidationService
         .validatePhoneNumber(NUMBER);
     assertTrue(phoneNumberResponse.isPresent());
@@ -49,7 +48,7 @@ class PhoneNumberValidationServiceTest {
   }
 
   @Test
-  public void obtainResponseWhenInfoIsNotInDatabase() {
+  public void obtainResponseWhenInfoIsNotInDatabase() throws EmptyResultDataAccessException {
     PhoneNumber phoneNumber = new PhoneNumber();
     phoneNumber.setNumber("14154582468");
     phoneNumber.setCountryName("United States");
@@ -65,7 +64,7 @@ class PhoneNumberValidationServiceTest {
   }
 
   @Test
-  public void obtainEmptyResponseWhenInfoIsNotInDatabaseNeitherExternalAPI() {
+  public void obtainEmptyResponseWhenInfoIsNotInDatabaseNeitherExternalAPI() throws EmptyResultDataAccessException {
     PhoneNumber phoneNumber = new PhoneNumber();
     phoneNumber.setNumber("14154582468");
     phoneNumber.setCountryName("United States");
@@ -91,12 +90,15 @@ class PhoneNumberValidationServiceTest {
     phoneNumber.setCountryName("United States");
     phoneNumber.setIsValid(Boolean.TRUE);
 
-    List<String> numbers = new ArrayList<>();
+    List<PhoneNumber> phoneNumberList = new ArrayList<>();
+    phoneNumberList.add(phoneNumber);
+    phoneNumberList.add(phoneNumber2);
+
+    Set<String> numbers = new HashSet<>();
     numbers.add(NUMBER);
     numbers.add(NUMBER_2);
 
-    when(phoneNumberJDBCRepository.findByNumber(NUMBER)).thenReturn(Optional.of(phoneNumber));
-    when(phoneNumberJDBCRepository.findByNumber(NUMBER_2)).thenReturn(Optional.of(phoneNumber2));
+    when(phoneNumberJDBCRepository.findByListOfNumbers(numbers)).thenReturn(phoneNumberList);
 
     List<PhoneNumberResponse> phoneNumberResponses = phoneNumberValidationService
         .validatePhoneNumbers(numbers);
