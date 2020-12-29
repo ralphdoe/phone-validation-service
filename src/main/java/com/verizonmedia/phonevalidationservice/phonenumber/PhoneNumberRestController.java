@@ -19,24 +19,27 @@ public class PhoneNumberRestController implements PhoneNumberController {
   private final PhoneNumberValidationService phoneNumberValidationService;
 
   @GetMapping("/validate/{number}")
-  public ResponseEntity<PhoneNumberResponse> validatePhoneNumber(
+  public ResponseEntity validatePhoneNumber(
       @PathVariable("number") String number) {
     try {
       Optional<PhoneNumberResponse> phoneNumberResponse = phoneNumberValidationService
           .validatePhoneNumber(number);
-      return phoneNumberResponse.map(ResponseEntity::ok)
-          .orElseGet(() -> ResponseEntity.notFound().build());
+      if (phoneNumberResponse.isPresent()) {
+        return new ResponseEntity<>(phoneNumberResponse.get(), HttpStatus.OK);
+      } else {
+        return new ResponseEntity<>("Error Finding Data", HttpStatus.BAD_REQUEST);
+      }
     } catch (PhoneNumberException ex) {
-      return ResponseEntity.status(Integer.parseInt(ex.getStatusCode())).build();
+      return ResponseEntity.status(Integer.parseInt(ex.getStatusCode())).body(ex.getMessage());
     }
   }
 
   @GetMapping("/validate")
-  public ResponseEntity<List<PhoneNumberResponse>> validatePhoneNumbers(
+  public ResponseEntity validatePhoneNumbers(
       @RequestParam Set<String> numbers) {
     List<PhoneNumberResponse> response = phoneNumberValidationService.validatePhoneNumbers(numbers);
     if (response.isEmpty()) {
-      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<>("Error Finding Data", HttpStatus.BAD_REQUEST);
     }
     return new ResponseEntity<>(response, HttpStatus.OK);
   }

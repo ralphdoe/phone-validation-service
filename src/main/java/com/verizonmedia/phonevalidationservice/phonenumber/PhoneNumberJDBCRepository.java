@@ -34,7 +34,7 @@ public class PhoneNumberJDBCRepository {
     return Optional.ofNullable(phoneNumber);
   }
 
-  public List<PhoneNumber> findByListOfNumbers(Set<String> numbers) {
+  public List<PhoneNumber> findBySetOfNumbers(Set<String> numbers) {
     List<PhoneNumber> phoneNumberList = jdbcTemplate
         .query(PHONE_NUMBER_SELECT_IN_QUERY + generateInClauseFromNumber(numbers.size()),
             new PhoneNumberRowMapper(), numbers.toArray());

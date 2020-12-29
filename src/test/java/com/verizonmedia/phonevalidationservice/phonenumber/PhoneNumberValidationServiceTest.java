@@ -100,7 +100,7 @@ class PhoneNumberValidationServiceTest {
     numbers.add(NUMBER_2);
     numbers.add(NUMBER_3);
 
-    when(phoneNumberJDBCRepository.findByListOfNumbers(numbers)).thenReturn(phoneNumberList);
+    when(phoneNumberJDBCRepository.findBySetOfNumbers(numbers)).thenReturn(phoneNumberList);
 
     List<PhoneNumberResponse> phoneNumberResponses = phoneNumberValidationService
         .validatePhoneNumbers(numbers);

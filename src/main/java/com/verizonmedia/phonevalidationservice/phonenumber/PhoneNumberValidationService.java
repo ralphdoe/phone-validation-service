@@ -65,7 +65,7 @@ public class PhoneNumberValidationService {
    * @return List with Responses.
    */
   public List<PhoneNumberResponse> validatePhoneNumbers(Set<String> numbers) {
-    List<PhoneNumber> phoneNumberList = phoneNumberJDBCRepository.findByListOfNumbers(numbers);
+    List<PhoneNumber> phoneNumberList = phoneNumberJDBCRepository.findBySetOfNumbers(numbers);
     List<PhoneNumber> phoneNumberBatch = new ArrayList<>();
     for (String number : numbers) {
       if (phoneNumberList.stream().map(PhoneNumber::getNumber).noneMatch(number::equals)) {
