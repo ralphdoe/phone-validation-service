@@ -4,8 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-import com.verizonmedia.phonevalidationservice.phone.webclient.PhoneNumberClient;
-import com.verizonmedia.phonevalidationservice.phone.webclient.WebClientException;
+import com.verizonmedia.phonevalidationservice.phone.client.FeignService;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -17,18 +16,20 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.web.reactive.function.client.WebClientException;
 
 @ExtendWith(MockitoExtension.class)
 class PhoneNumberValidationServiceTest {
 
   public static final String NUMBER = "14154582468";
-  public static final String NUMBER_2 = "14154582468";
+  public static final String NUMBER_2 = "573015261679";
+  public static final String NUMBER_3 = "573015261679";
   public static final int ACTUAL = 2;
 
   @Mock
   private PhoneNumberJDBCRepository phoneNumberJDBCRepository;
   @Mock
-  private PhoneNumberClient phoneNumberClient;
+  private FeignService feignService;
 
   @InjectMocks
   private PhoneNumberValidationService phoneNumberValidationService;
@@ -38,6 +39,8 @@ class PhoneNumberValidationServiceTest {
     PhoneNumber phoneNumber = new PhoneNumber();
     phoneNumber.setNumber("14154582468");
     phoneNumber.setCountryName("United States");
+    phoneNumber.setCountryPrefix("US");
+    phoneNumber.setCountryCode("+1");
     phoneNumber.setIsValid(Boolean.TRUE);
     when(phoneNumberJDBCRepository.findByNumber(NUMBER)).thenReturn(Optional.of(phoneNumber));
     Optional<PhoneNumberResponse> phoneNumberResponse = phoneNumberValidationService
@@ -55,7 +58,8 @@ class PhoneNumberValidationServiceTest {
     phoneNumber.setCountryName("United States");
     phoneNumber.setIsValid(Boolean.TRUE);
     when(phoneNumberJDBCRepository.findByNumber(NUMBER)).thenReturn(Optional.empty());
-    when(phoneNumberClient.getPhoneNumber(NUMBER)).thenReturn(Optional.of(phoneNumber));
+    when(feignService.getPhoneNumber(NUMBER))
+        .thenReturn(Optional.of(phoneNumber));
 
     Optional<PhoneNumberResponse> phoneNumberResponse = phoneNumberValidationService
         .validatePhoneNumber(NUMBER);
@@ -72,7 +76,8 @@ class PhoneNumberValidationServiceTest {
     phoneNumber.setCountryName("United States");
     phoneNumber.setIsValid(Boolean.TRUE);
     when(phoneNumberJDBCRepository.findByNumber(NUMBER)).thenReturn(Optional.empty());
-    when(phoneNumberClient.getPhoneNumber(NUMBER)).thenReturn(Optional.empty());
+    when(feignService.getPhoneNumber(NUMBER))
+        .thenReturn(Optional.empty());
 
     Optional<PhoneNumberResponse> phoneNumberResponse = phoneNumberValidationService
         .validatePhoneNumber(NUMBER);
@@ -81,7 +86,7 @@ class PhoneNumberValidationServiceTest {
   }
 
   @Test
-  public void obtainResponsesListWhenInfoComesFromDatabase() {
+  public void obtainResponsesListWhenInfoComesFromDatabaseAndEndpoint() {
     PhoneNumber phoneNumber = new PhoneNumber();
     phoneNumber.setNumber("14154582468");
     phoneNumber.setCountryName("United States");
@@ -99,6 +104,7 @@ class PhoneNumberValidationServiceTest {
     Set<String> numbers = new HashSet<>();
     numbers.add(NUMBER);
     numbers.add(NUMBER_2);
+    numbers.add(NUMBER_3);
 
     when(phoneNumberJDBCRepository.findByListOfNumbers(numbers)).thenReturn(phoneNumberList);
 
@@ -106,7 +112,6 @@ class PhoneNumberValidationServiceTest {
         .validatePhoneNumbers(numbers);
 
     assertEquals(phoneNumberResponses.size(), ACTUAL);
-
   }
 
 }

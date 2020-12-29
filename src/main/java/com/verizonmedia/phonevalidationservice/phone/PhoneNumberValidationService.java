@@ -1,8 +1,8 @@
 package com.verizonmedia.phonevalidationservice.phone;
 
 import com.googlecode.jmapper.JMapper;
-import com.verizonmedia.phonevalidationservice.phone.webclient.PhoneNumberClient;
-import com.verizonmedia.phonevalidationservice.phone.webclient.WebClientException;
+import com.verizonmedia.phonevalidationservice.phone.client.FeignService;
+import com.verizonmedia.phonevalidationservice.phone.client.PhoneNumberException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +20,7 @@ import org.springframework.util.StringUtils;
 public class PhoneNumberValidationService {
 
   private final PhoneNumberJDBCRepository phoneNumberJDBCRepository;
-  private final PhoneNumberClient phoneNumberClient;
+  private final FeignService feignService;
 
   JMapper<PhoneNumberResponse, PhoneNumber> mapper = new JMapper<>(PhoneNumberResponse.class,
       PhoneNumber.class);
@@ -32,22 +32,21 @@ public class PhoneNumberValidationService {
    * @param number to search.
    * @return an Optional Response for the endpoint.
    */
-  public Optional<PhoneNumberResponse> validatePhoneNumber(String number) {
+  public Optional<PhoneNumberResponse> validatePhoneNumber(String number)
+      throws PhoneNumberException {
     Optional<PhoneNumber> phoneNumber;
     try {
       phoneNumber = phoneNumberJDBCRepository.findByNumber(number);
-      return Optional.of(phoneNumber.map(mapper::getDestination).get());
+      if (phoneNumber.isPresent()) {
+        return Optional.of(phoneNumber.map(mapper::getDestination).get());
+      }
     } catch (EmptyResultDataAccessException exception) {
       log.error("Error searching the data: " + exception.getMessage());
     }
 
     // If the Phone Number is not in the Database it goes to a third party service to obtain data.
-    try {
-      phoneNumber = phoneNumberClient.getPhoneNumber(number);
-    } catch (WebClientException e) {
-      log.error(e.getMessage());
-      return Optional.empty();
-    }
+    phoneNumber = feignService.getPhoneNumber(number);
+
     if (phoneNumber.isPresent()) {
       PhoneNumber phoneNumberObject = phoneNumber.get();
       if (!StringUtils.isEmpty(phoneNumberObject.getNumber())) {
@@ -70,11 +69,7 @@ public class PhoneNumberValidationService {
     List<PhoneNumber> phoneNumberBatch = new ArrayList<>();
     for (String number : numbers) {
       if (phoneNumberList.stream().map(PhoneNumber::getNumber).noneMatch(number::equals)) {
-        try {
-          phoneNumberClient.getPhoneNumber(number).map(phoneNumberBatch::add);
-        } catch (WebClientException e) {
-          log.error(e.getMessage());
-        }
+        feignService.getPhoneNumber(number).map(phoneNumberBatch::add);
       }
     }
     if (phoneNumberBatch.size() > 0) {

@@ -69,7 +69,6 @@ public class PhoneNumberJDBCRepository {
         }));
   }
 
-
   public String generateInClauseFromNumber(int size) {
     StringBuilder inClause = new StringBuilder();
     inClause.append("(");

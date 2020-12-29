@@ -1,9 +1,11 @@
 package com.verizonmedia.phonevalidationservice.phone;
 
+import com.verizonmedia.phonevalidationservice.phone.client.PhoneNumberException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,10 +21,14 @@ public class PhoneNumberRestController implements PhoneNumberController {
   @GetMapping("/validate/{number}")
   public ResponseEntity<PhoneNumberResponse> validatePhoneNumber(
       @PathVariable("number") String number) {
-    Optional<PhoneNumberResponse> phoneNumberResponse = phoneNumberValidationService
-        .validatePhoneNumber(number);
-    return phoneNumberResponse.map(ResponseEntity::ok)
-        .orElseGet(() -> ResponseEntity.notFound().build());
+    try {
+      Optional<PhoneNumberResponse> phoneNumberResponse = phoneNumberValidationService
+          .validatePhoneNumber(number);
+      return phoneNumberResponse.map(ResponseEntity::ok)
+          .orElseGet(() -> ResponseEntity.notFound().build());
+    } catch (PhoneNumberException ex) {
+      return ResponseEntity.status(Integer.parseInt(ex.getStatusCode())).build();
+    }
   }
 
   @GetMapping("/validate")
@@ -30,8 +36,8 @@ public class PhoneNumberRestController implements PhoneNumberController {
       @RequestParam Set<String> numbers) {
     List<PhoneNumberResponse> response = phoneNumberValidationService.validatePhoneNumbers(numbers);
     if (response.isEmpty()) {
-      return ResponseEntity.notFound().build();
+      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
-    return ResponseEntity.ok(response);
+    return new ResponseEntity<>(response, HttpStatus.OK);
   }
 }
