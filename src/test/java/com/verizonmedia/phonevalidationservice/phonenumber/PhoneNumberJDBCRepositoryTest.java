@@ -1,4 +1,4 @@
-package com.verizonmedia.phonevalidationservice.phone;
+package com.verizonmedia.phonevalidationservice.phonenumber;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

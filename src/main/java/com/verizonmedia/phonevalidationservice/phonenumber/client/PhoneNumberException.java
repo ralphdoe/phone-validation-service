@@ -1,4 +1,4 @@
-package com.verizonmedia.phonevalidationservice.phone.client;
+package com.verizonmedia.phonevalidationservice.phonenumber.client;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

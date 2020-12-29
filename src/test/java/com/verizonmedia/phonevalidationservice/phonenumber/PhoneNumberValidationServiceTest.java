@@ -1,22 +1,23 @@
-package com.verizonmedia.phonevalidationservice.phone;
+package com.verizonmedia.phonevalidationservice.phonenumber;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-import com.verizonmedia.phonevalidationservice.phone.client.FeignService;
+import com.verizonmedia.phonevalidationservice.phonenumber.client.PhoneNumberFeignService;
+import com.verizonmedia.phonevalidationservice.phonenumber.client.PhoneNumberException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.web.reactive.function.client.WebClientException;
 
 @ExtendWith(MockitoExtension.class)
 class PhoneNumberValidationServiceTest {
@@ -28,20 +29,27 @@ class PhoneNumberValidationServiceTest {
 
   @Mock
   private PhoneNumberJDBCRepository phoneNumberJDBCRepository;
+
   @Mock
-  private FeignService feignService;
+  private PhoneNumberFeignService phoneNumberFeignService;
 
   @InjectMocks
   private PhoneNumberValidationService phoneNumberValidationService;
 
-  @Test
-  public void obtainResponseWhenInfoComesFromDatabase() throws EmptyResultDataAccessException {
-    PhoneNumber phoneNumber = new PhoneNumber();
+  private PhoneNumber phoneNumber;
+
+  @BeforeEach
+  public void setUp() {
+    phoneNumber = new PhoneNumber();
     phoneNumber.setNumber("14154582468");
     phoneNumber.setCountryName("United States");
     phoneNumber.setCountryPrefix("US");
     phoneNumber.setCountryCode("+1");
     phoneNumber.setIsValid(Boolean.TRUE);
+  }
+
+  @Test
+  public void obtainResponseWhenInfoComesFromDatabase() throws EmptyResultDataAccessException {
     when(phoneNumberJDBCRepository.findByNumber(NUMBER)).thenReturn(Optional.of(phoneNumber));
     Optional<PhoneNumberResponse> phoneNumberResponse = phoneNumberValidationService
         .validatePhoneNumber(NUMBER);
@@ -52,13 +60,9 @@ class PhoneNumberValidationServiceTest {
 
   @Test
   public void obtainResponseWhenInfoIsNotInDatabase()
-      throws EmptyResultDataAccessException, WebClientException {
-    PhoneNumber phoneNumber = new PhoneNumber();
-    phoneNumber.setNumber("14154582468");
-    phoneNumber.setCountryName("United States");
-    phoneNumber.setIsValid(Boolean.TRUE);
+      throws EmptyResultDataAccessException, PhoneNumberException {
     when(phoneNumberJDBCRepository.findByNumber(NUMBER)).thenReturn(Optional.empty());
-    when(feignService.getPhoneNumber(NUMBER))
+    when(phoneNumberFeignService.getPhoneNumber(NUMBER))
         .thenReturn(Optional.of(phoneNumber));
 
     Optional<PhoneNumberResponse> phoneNumberResponse = phoneNumberValidationService
@@ -70,28 +74,18 @@ class PhoneNumberValidationServiceTest {
 
   @Test
   public void obtainEmptyResponseWhenInfoIsNotInDatabaseNeitherExternalAPI()
-      throws EmptyResultDataAccessException, WebClientException {
-    PhoneNumber phoneNumber = new PhoneNumber();
-    phoneNumber.setNumber("14154582468");
-    phoneNumber.setCountryName("United States");
-    phoneNumber.setIsValid(Boolean.TRUE);
+      throws EmptyResultDataAccessException, PhoneNumberException {
     when(phoneNumberJDBCRepository.findByNumber(NUMBER)).thenReturn(Optional.empty());
-    when(feignService.getPhoneNumber(NUMBER))
+    when(phoneNumberFeignService.getPhoneNumber(NUMBER))
         .thenReturn(Optional.empty());
 
     Optional<PhoneNumberResponse> phoneNumberResponse = phoneNumberValidationService
         .validatePhoneNumber(NUMBER);
     assertTrue(phoneNumberResponse.isEmpty());
-
   }
 
   @Test
   public void obtainResponsesListWhenInfoComesFromDatabaseAndEndpoint() {
-    PhoneNumber phoneNumber = new PhoneNumber();
-    phoneNumber.setNumber("14154582468");
-    phoneNumber.setCountryName("United States");
-    phoneNumber.setIsValid(Boolean.TRUE);
-
     PhoneNumber phoneNumber2 = new PhoneNumber();
     phoneNumber.setNumber("573015261679");
     phoneNumber.setCountryName("United States");
@@ -113,5 +107,4 @@ class PhoneNumberValidationServiceTest {
 
     assertEquals(phoneNumberResponses.size(), ACTUAL);
   }
-
 }

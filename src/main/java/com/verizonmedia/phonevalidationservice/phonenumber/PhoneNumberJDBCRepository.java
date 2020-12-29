@@ -1,4 +1,4 @@
-package com.verizonmedia.phonevalidationservice.phone;
+package com.verizonmedia.phonevalidationservice.phonenumber;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -49,7 +49,7 @@ public class PhoneNumberJDBCRepository {
             phoneNumber.getCountryPrefix()));
   }
 
-  public void createPhoneNumberList(List<PhoneNumber> phoneNumbers) {
+  public void createPhoneNumbersBatchMode(List<PhoneNumber> phoneNumbers) {
     log.info("Creating Phone Number List -> {}", jdbcTemplate
         .batchUpdate(PHONE_NUMBER_INSERT_QUERY, new BatchPreparedStatementSetter() {
           @Override

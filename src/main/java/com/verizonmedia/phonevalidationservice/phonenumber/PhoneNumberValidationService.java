@@ -1,8 +1,8 @@
-package com.verizonmedia.phonevalidationservice.phone;
+package com.verizonmedia.phonevalidationservice.phonenumber;
 
 import com.googlecode.jmapper.JMapper;
-import com.verizonmedia.phonevalidationservice.phone.client.FeignService;
-import com.verizonmedia.phonevalidationservice.phone.client.PhoneNumberException;
+import com.verizonmedia.phonevalidationservice.phonenumber.client.PhoneNumberFeignService;
+import com.verizonmedia.phonevalidationservice.phonenumber.client.PhoneNumberException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +20,7 @@ import org.springframework.util.StringUtils;
 public class PhoneNumberValidationService {
 
   private final PhoneNumberJDBCRepository phoneNumberJDBCRepository;
-  private final FeignService feignService;
+  private final PhoneNumberFeignService phoneNumberFeignService;
 
   JMapper<PhoneNumberResponse, PhoneNumber> mapper = new JMapper<>(PhoneNumberResponse.class,
       PhoneNumber.class);
@@ -45,7 +45,7 @@ public class PhoneNumberValidationService {
     }
 
     // If the Phone Number is not in the Database it goes to a third party service to obtain data.
-    phoneNumber = feignService.getPhoneNumber(number);
+    phoneNumber = phoneNumberFeignService.getPhoneNumber(number);
 
     if (phoneNumber.isPresent()) {
       PhoneNumber phoneNumberObject = phoneNumber.get();
@@ -69,11 +69,11 @@ public class PhoneNumberValidationService {
     List<PhoneNumber> phoneNumberBatch = new ArrayList<>();
     for (String number : numbers) {
       if (phoneNumberList.stream().map(PhoneNumber::getNumber).noneMatch(number::equals)) {
-        feignService.getPhoneNumber(number).map(phoneNumberBatch::add);
+        phoneNumberFeignService.getPhoneNumber(number).map(phoneNumberBatch::add);
       }
     }
     if (phoneNumberBatch.size() > 0) {
-      phoneNumberJDBCRepository.createPhoneNumberList(phoneNumberBatch);
+      phoneNumberJDBCRepository.createPhoneNumbersBatchMode(phoneNumberBatch);
       phoneNumberList.addAll(phoneNumberBatch);
     }
     return phoneNumberList.stream().map(mapper::getDestination).collect(Collectors.toList());

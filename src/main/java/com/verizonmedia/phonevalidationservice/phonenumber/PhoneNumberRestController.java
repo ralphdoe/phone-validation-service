@@ -1,6 +1,6 @@
-package com.verizonmedia.phonevalidationservice.phone;
+package com.verizonmedia.phonevalidationservice.phonenumber;
 
-import com.verizonmedia.phonevalidationservice.phone.client.PhoneNumberException;
+import com.verizonmedia.phonevalidationservice.phonenumber.client.PhoneNumberException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;

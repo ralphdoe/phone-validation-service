@@ -1,6 +1,6 @@
-package com.verizonmedia.phonevalidationservice.phone.client;
+package com.verizonmedia.phonevalidationservice.phonenumber.client;
 
-import com.verizonmedia.phonevalidationservice.phone.PhoneNumber;
+import com.verizonmedia.phonevalidationservice.phonenumber.PhoneNumber;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +11,7 @@ import org.springframework.util.StringUtils;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class FeignService {
+public class PhoneNumberFeignService {
 
   @Value("${numverify.access.token}")
   private String numVerifyToken;

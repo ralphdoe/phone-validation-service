@@ -2,7 +2,7 @@
 Phone Validation Service
 
 ##### It is possible to run the project with next command (Unix Based OS):
-##### 1. mvn clean install
+##### 1. ./mvnw clean install
 ##### 2. ./mvnw spring-boot:run
 
 ##### You can also test it on this url:
