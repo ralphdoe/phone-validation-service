@@ -1,8 +1,8 @@
 package com.verizonmedia.phonevalidationservice.phonenumber;
 
 import com.googlecode.jmapper.JMapper;
-import com.verizonmedia.phonevalidationservice.phonenumber.client.PhoneNumberFeignService;
 import com.verizonmedia.phonevalidationservice.phonenumber.client.PhoneNumberException;
+import com.verizonmedia.phonevalidationservice.phonenumber.client.PhoneNumberFeignService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +41,7 @@ public class PhoneNumberValidationService {
         return Optional.of(phoneNumber.map(mapper::getDestination).get());
       }
     } catch (EmptyResultDataAccessException exception) {
-      log.error("Error searching the data: " + exception.getMessage());
+      log.warn("Data not found in local database: " + exception.getMessage());
     }
 
     // If the Phone Number is not in the Database it goes to a third party service to obtain data.
@@ -64,7 +64,8 @@ public class PhoneNumberValidationService {
    * @param numbers list to search.
    * @return List with Responses.
    */
-  public List<PhoneNumberResponse> validatePhoneNumbers(Set<String> numbers) {
+  public List<PhoneNumberResponse> validatePhoneNumbers(Set<String> numbers)
+      throws PhoneNumberException {
     List<PhoneNumber> phoneNumberList = phoneNumberJDBCRepository.findBySetOfNumbers(numbers);
     List<PhoneNumber> phoneNumberBatch = new ArrayList<>();
     for (String number : numbers) {

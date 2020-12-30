@@ -12,10 +12,10 @@ import org.springframework.http.ResponseEntity;
         description = "Phone Validation", version = "1.0.0"))
 public interface PhoneNumberController {
 
-  @Operation(summary = "You can validate one Phone Number.")
+  @Operation(summary = "You can validate one Phone Number.", description = "Validate one Phone Number.")
   ResponseEntity<PhoneNumberResponse> validatePhoneNumber(String number);
 
-  @Operation(summary = "You can validate a list of Phone Numbers.")
+  @Operation(summary = "You can validate a list of Phone Numbers.", description = "Validate a List of  Phone Numbers.")
   ResponseEntity<List<PhoneNumberResponse>> validatePhoneNumbers(Set<String> number);
 
 }

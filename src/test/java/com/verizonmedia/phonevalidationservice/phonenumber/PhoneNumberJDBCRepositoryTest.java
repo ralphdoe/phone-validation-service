@@ -1,8 +1,10 @@
 package com.verizonmedia.phonevalidationservice.phonenumber;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,29 +16,24 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 class PhoneNumberJDBCRepositoryTest {
 
-  @InjectMocks
-  private PhoneNumberJDBCRepository
-      phoneNumberJDBCRepository;
-
   private static final String PHONE_NUMBER_SELECT_QUERY =
-      "SELECT * FROM phone_numbers WHERE phone_number = '14154582468';";
+      "SELECT * FROM phone_numbers WHERE phone_number = ?;";
 
   private static final String PHONE_NUMBER_SELECT_IN_QUERY =
       "SELECT * FROM phone_numbers WHERE phone_number = IN('14154582468');";
 
   @Mock
   JdbcTemplate jdbcTemplate;
+
+  @InjectMocks
+  private PhoneNumberJDBCRepository phoneNumberJDBCRepository;
 
   private PhoneNumber phoneNumber;
 
@@ -51,14 +48,14 @@ class PhoneNumberJDBCRepositoryTest {
   }
 
   @Test
-  public void whenMockJdbcTemplate_thenReturnEmptyPhoneNumber() {
-    ReflectionTestUtils.setField(phoneNumberJDBCRepository, "jdbcTemplate", jdbcTemplate);
-    Mockito.when(jdbcTemplate
-        .queryForObject(PHONE_NUMBER_SELECT_QUERY, new PhoneNumberRowMapper(), PhoneNumber.class))
+  public void whenMockJdbcTemplate_thenReturnPhoneNumber() {
+    when(jdbcTemplate
+        .queryForObject(anyString(), any(PhoneNumberRowMapper.class),
+            anyString()))
         .thenReturn(phoneNumber);
     Optional<PhoneNumber> numberResult = phoneNumberJDBCRepository
         .findByNumber(phoneNumber.getNumber());
-    assertFalse(numberResult.isPresent());
+    assertTrue(numberResult.isPresent());
   }
 
   @Test
@@ -68,12 +65,11 @@ class PhoneNumberJDBCRepositoryTest {
     List<PhoneNumber> phoneNumberList = new ArrayList<>();
     phoneNumberList.add(phoneNumber);
     ReflectionTestUtils.setField(phoneNumberJDBCRepository, "jdbcTemplate", jdbcTemplate);
-    Mockito.when(jdbcTemplate
-        .query(PHONE_NUMBER_SELECT_IN_QUERY, new PhoneNumberRowMapper(), numbers.toArray()))
+    when(jdbcTemplate.query(anyString(), any(PhoneNumberRowMapper.class), any()))
         .thenReturn(phoneNumberList);
     List<PhoneNumber> phoneNumberListResult = phoneNumberJDBCRepository
         .findBySetOfNumbers(numbers);
-    assertTrue(phoneNumberListResult.size() == 0);
+    assertEquals(1, phoneNumberListResult.size());
   }
 
   @Test

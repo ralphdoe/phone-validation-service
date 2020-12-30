@@ -19,28 +19,34 @@ public class PhoneNumberRestController implements PhoneNumberController {
   private final PhoneNumberValidationService phoneNumberValidationService;
 
   @GetMapping("/validate/{number}")
-  public ResponseEntity validatePhoneNumber(
+  public ResponseEntity<PhoneNumberResponse> validatePhoneNumber(
       @PathVariable("number") String number) {
     try {
       Optional<PhoneNumberResponse> phoneNumberResponse = phoneNumberValidationService
           .validatePhoneNumber(number);
-      if (phoneNumberResponse.isPresent()) {
-        return new ResponseEntity<>(phoneNumberResponse.get(), HttpStatus.OK);
-      } else {
-        return new ResponseEntity<>("Error Finding Data", HttpStatus.BAD_REQUEST);
-      }
+      return phoneNumberResponse
+          .map(numberResponse -> new ResponseEntity<>(numberResponse, HttpStatus.OK)).orElseGet(
+              () -> new ResponseEntity("Error Finding Data In Service", HttpStatus.BAD_REQUEST));
     } catch (PhoneNumberException ex) {
-      return ResponseEntity.status(Integer.parseInt(ex.getStatusCode())).body(ex.getMessage());
+      return new ResponseEntity(ex.getInfo(), HttpStatus.BAD_REQUEST);
     }
   }
 
   @GetMapping("/validate")
-  public ResponseEntity validatePhoneNumbers(
+  public ResponseEntity<List<PhoneNumberResponse>> validatePhoneNumbers(
       @RequestParam Set<String> numbers) {
-    List<PhoneNumberResponse> response = phoneNumberValidationService.validatePhoneNumbers(numbers);
-    if (response.isEmpty()) {
-      return new ResponseEntity<>("Error Finding Data", HttpStatus.BAD_REQUEST);
+    try {
+      List<PhoneNumberResponse> response = phoneNumberValidationService
+          .validatePhoneNumbers(numbers);
+      if (response.isEmpty()) {
+        return new ResponseEntity("Error Finding Data In Service", HttpStatus.BAD_REQUEST);
+      }
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    } catch (PhoneNumberException ex) {
+      return new ResponseEntity(ex.getInfo(), HttpStatus.BAD_REQUEST);
+
     }
-    return new ResponseEntity<>(response, HttpStatus.OK);
+
+
   }
 }

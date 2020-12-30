@@ -11,7 +11,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PhoneNumberException extends RuntimeException {
 
-  private String statusCode;
-  private String message;
+  private String code;
+  private String type;
+  private String info;
 
 }
